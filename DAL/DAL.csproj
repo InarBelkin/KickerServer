@@ -10,8 +10,4 @@
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\BLLAdapter\BLLAdapter.csproj" />
-    </ItemGroup>
-
 </Project>
