@@ -11,10 +11,12 @@ public class KickerContext : DbContext
     public KickerContext(DbContextOptions<KickerContext> options) : base(options)
 #pragma warning restore CS8618
     {
+        Database.EnsureCreated();
     }
 
-    private DbSet<AuthInfo> AuthInfos { get; set; }
-    private DbSet<AuthInfoFirebase> AuthInfosFirebase { get; set; }
+    public DbSet<AuthInfo> AuthInfos { get; set; }
+    public DbSet<AuthInfoFirebase> AuthInfosFirebase { get; set; }
+    public DbSet<AuthInfoMail> AuthInfosMail { get; set; }
 
     public DbSet<User> Users { get; set; }
 
