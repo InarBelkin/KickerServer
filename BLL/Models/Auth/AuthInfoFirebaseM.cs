@@ -1,4 +1,4 @@
-namespace BLLAdapter.Models.Auth;
+namespace BLL.Models.Auth;
 
 public class AuthInfoFirebaseM : IAuthInfoM
 {

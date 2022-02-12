@@ -22,4 +22,8 @@ public class KickerContext : DbContext
 
     public DbSet<StatsOneVsOne> StatsOneVsOnes { get; set; }
     public DbSet<StatsTwoVsTwo> StatsTwoVsTwos { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+    }
 }

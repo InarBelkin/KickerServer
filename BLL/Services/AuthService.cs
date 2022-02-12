@@ -1,24 +1,51 @@
+using BLL.Dtos.Auth;
 using BLL.Interfaces;
-using BLLAdapter.Interfaces;
-using BLLAdapter.Models.Auth;
+using BLL.Models.Auth;
+using DAL.Entities;
+using DAL.Entities.Auth;
 using Microsoft.AspNetCore.Http;
 
 namespace BLL.Services;
 
-public class AuthService : ServiceBase, IAuthService
+public class AuthService : ServiceBasePg, IAuthService
 {
-    private readonly IAuthRepos _authRepos;
-    
-    public AuthService(IAuthRepos authRepos,IHttpContextAccessor accessor) : base(accessor)
+    public AuthService(IHttpContextAccessor accessor) : base(accessor)
     {
-        _authRepos = authRepos;
     }
 
-    public async Task RegisterUserByEmail(string email)
+    public async Task RegisterUserByEmail(RegisterByEmailDto regDto)
     {
-        await _authRepos.AddNewUser(new UserAuthM()
-            {Name = email, AuthInfos = new() {new AuthInfoMailM() {Email = email, HashPassword = "pip"}}});
+        await RegisterUser(new UserAuthM()
+        {
+            Name = regDto.Name, AuthInfos = {new AuthInfoMailM() {Email = regDto.Email, HashPassword = regDto.Password}}
+        });
     }
 
+    public async Task
+        RegisterUserByFirebase() //TODO: check if username is not unique, and then change it with added numbers to end.
+    {
+    }
 
+    internal async Task RegisterUser(UserAuthM user)
+    {
+        User dbUser = new()
+        {
+            Name = user.Name,
+            StatsOneVsOne = new StatsOneVsOne(),
+            StatsTwoVsTwo = new StatsTwoVsTwo()
+        };
+        foreach (var authInfoM in user.AuthInfos)
+            switch (authInfoM)
+            {
+                case AuthInfoFirebaseM firebaseM:
+                    dbUser.AuthInfos.Add(new AuthInfoFirebase() {FirebaseUuid = firebaseM.FirebaseUuid});
+                    break;
+                case AuthInfoMailM mailM:
+                    dbUser.AuthInfos.Add(new AuthInfoMail() {Email = mailM.Email, HashPassword = mailM.HashPassword});
+                    break;
+            }
+
+        Db.Users.Add(dbUser);
+        await Db.SaveChangesAsync();
+    }
 }

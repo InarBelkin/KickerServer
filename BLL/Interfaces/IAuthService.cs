@@ -1,6 +1,8 @@
+using BLL.Dtos.Auth;
+
 namespace BLL.Interfaces;
 
 public interface IAuthService
 {
-    public Task RegisterUserByEmail(string email);
+    public Task RegisterUserByEmail(RegisterByEmailDto regDto);
 }

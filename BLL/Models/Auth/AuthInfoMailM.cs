@@ -1,6 +1,6 @@
 using static System.String;
 
-namespace BLLAdapter.Models.Auth;
+namespace BLL.Models.Auth;
 
 public class AuthInfoMailM : IAuthInfoM
 {
