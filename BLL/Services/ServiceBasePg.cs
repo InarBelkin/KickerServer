@@ -11,8 +11,7 @@ public abstract class ServiceBasePg
 
     protected ServiceBasePg(IHttpContextAccessor accessor)
     {
-        HttpContext = accessor.HttpContext;
-        Db = HttpContext.RequestServices.GetService<KickerContext>() ??
-             throw new NullReferenceException("DbContext was null");
+        HttpContext = accessor.HttpContext!;
+        Db = HttpContext.RequestServices.GetService<KickerContext>() !;
     }
 }
