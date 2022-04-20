@@ -68,7 +68,8 @@ public class AuthService : ServiceBasePg, IAuthService
     public async Task<LoginAnswerDto> LoginByEmail(LoginDto loginDto)
     {
         var authInfoMail = await Db.AuthInfosMail.Where(a =>
-                a.Email == loginDto.Email && a.HashPassword == HashPass(loginDto.Password)).Include(a => a.User)
+                a.Email == loginDto.Email.Trim(' ').ToLower() && a.HashPassword == HashPass(loginDto.Password))
+            .Include(a => a.User)
             .FirstOrDefaultAsync();
 
         if (authInfoMail?.User == null)

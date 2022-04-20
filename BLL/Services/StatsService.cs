@@ -17,7 +17,7 @@ public class StatsService : ServiceBasePg, IStatsService
         _mapper = mapper;
     }
 
-    public async Task<List<UserLeaderboardDto>> GetLeadersList()
+    public async Task<LeaderboardWrapper> GetLeadersList()
     {
         var request = Db.Users
             .Select(u => new UserLeaderboardDto()
@@ -31,7 +31,10 @@ public class StatsService : ServiceBasePg, IStatsService
 
         var query = request.ToQueryString();
         var ret = await request.ToListAsync();
-        return ret;
+        return new LeaderboardWrapper()
+        {
+            Data = ret
+        };
     }
 
     public async Task<UserDetailsDto?> GetUserDetails(Guid userGuid)

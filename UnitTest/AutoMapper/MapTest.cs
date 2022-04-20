@@ -28,4 +28,5 @@ public class MapTest
 
         var userDetail = mapper.Map<User, UserDetailsDto>(user);
     }
+    
 }

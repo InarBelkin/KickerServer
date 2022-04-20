@@ -18,13 +18,13 @@ namespace KickerServer.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserLeaderboardDto>>> GetLeaders()
+        public async Task<ActionResult<LeaderboardWrapper>> GetLeaders()
         {
             return Ok(await _statsService.GetLeadersList());
         }
 
         [HttpGet("userDetails/{stringId}")]
-           public async Task<ActionResult<UserDetailsDto>> GetUserDetailsById(string stringId)
+        public async Task<ActionResult<UserDetailsDto>> GetUserDetailsById(string stringId)
         {
             var guid = Guid.Parse(stringId);
             var userDto = await _statsService.GetUserDetails(guid);
