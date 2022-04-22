@@ -12,18 +12,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.BLLRegister(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuer = true,
-//             
-//
-//         };
-//
-//     });
-
 var app = builder.Build();
 
 

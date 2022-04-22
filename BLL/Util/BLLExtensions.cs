@@ -18,6 +18,7 @@ public static class BLLExtensions
     {
         collection.AddScoped<IAuthService, AuthService>();
         collection.AddScoped<IStatsService, StatsService>();
+        collection.AddScoped<TokenService>();
         collection.DalRegister(configuration);
         collection.AddAutoMapper(typeof(MapperProfile));
         collection.AuthRegister(configuration);
@@ -43,6 +44,7 @@ public static class BLLExtensions
                 ValidateAudience = options.ValidateAudience,
                 ValidAudience = options.Audience,
                 ValidateLifetime = options.ValidateLifetime,
+                ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Key))
             };
         });

@@ -29,13 +29,24 @@ public class UsersController : ControllerBase
 
 
     [HttpPost("login")]
-    public async Task<ActionResult> Login(LoginDto loginDto)
+    public async Task<ActionResult<LoginAnswerDto>> Login(LoginDto loginDto)
     {
-        var valid = Validator.TryValidateObject(loginDto, new ValidationContext(loginDto),new List<ValidationResult>(),true);
+        var valid = Validator.TryValidateObject(loginDto, new ValidationContext(loginDto), new List<ValidationResult>(),
+            true);
         var answerDto = await _authService.LoginByEmail(loginDto);
 
         if (answerDto.Success)
             return Ok(answerDto);
         else return BadRequest(answerDto);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<LoginAnswerDto>> Refresh(LoginRefreshDto refreshDto)
+    {
+        var answer = await _authService.LoginByEmailRefresh(refreshDto);
+
+        if (answer.Success)
+            return Ok(answer);
+        return BadRequest(answer);
     }
 }
