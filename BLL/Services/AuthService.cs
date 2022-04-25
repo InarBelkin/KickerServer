@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using BLL.Dtos.Auth;
 using BLL.Interfaces;
@@ -27,8 +28,6 @@ public partial class AuthService : ServiceBasePg, IAuthService
     }
 
 
-   
-
     public async Task RegisterUserByFirebase()
     {
         //TODO: check if username is not unique, and then change it with added numbers to end.
@@ -55,5 +54,25 @@ public partial class AuthService : ServiceBasePg, IAuthService
 
         Db.Users.Add(dbUser);
         await Db.SaveChangesAsync();
+    }
+
+    public UserClaimData? GetUserClaims()
+    {
+        // return new ()
+        // {
+        //     Id =   HttpContext.User.Id
+        // }
+        //
+
+        var claims = HttpContext.User.Claims.ToList();
+        var id = claims.FirstOrDefault(u => u.Type == ClaimTypes.Sid);
+        var name = claims.FirstOrDefault(u => u.Type == ClaimTypes.Name);
+        if (id == null || name == null) return null;
+        var data = new UserClaimData()
+        {
+            Id = Guid.Parse(id.Value),
+            Name = id.Value
+        };
+        return data;
     }
 }

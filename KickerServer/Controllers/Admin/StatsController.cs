@@ -1,6 +1,7 @@
 ﻿using BLL.Dtos.Stats;
 using BLL.Interfaces;
 using BLL.Models.Stats;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +32,14 @@ namespace KickerServer.Controllers.Admin
 
 
             return userDto == null ? NotFound() : Ok(userDto);
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<ActionResult<MyPageDto>> GetMyPage()
+        {
+            var pageDto = await _statsService.GetMyPage();
+            return Ok(pageDto);
         }
     }
 }

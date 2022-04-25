@@ -61,7 +61,7 @@ public partial class AuthService : IAuthService
             .FirstOrDefaultAsync();
 
         if (authInfoMail?.User == null)
-            return new LoginAnswerDto() {Success = false, Message = "User not existed or password is incorrect"};
+            return new LoginAnswerDto() {Success = false, Message = "User doesn't not exists or password is incorrect"};
 
         var claims = new List<Claim>
         {
@@ -113,6 +113,7 @@ public partial class AuthService : IAuthService
             authInfo!.RefreshTokens = _tokenService.NewTokens(authInfo.RefreshTokens, dto.RefreshToken, refreshToken);
             Db.Entry(authInfo).State = EntityState.Modified;
             await Db.SaveChangesAsync();
+            
             return new LoginAnswerDto()
             {
                 Success = true,

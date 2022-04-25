@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using BLL.Dtos.Auth;
 using BLL.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KickerServer.Controllers.Admin;
@@ -22,9 +23,7 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<RegisterAnswerDto>> Register(RegisterByEmailDto registerDto)
     {
         var answerDto = await _authService.RegisterUserByEmail(registerDto);
-        if (answerDto.Success)
-            return Ok(answerDto);
-        else return BadRequest(answerDto);
+        return Ok(answerDto);
     }
 
 
@@ -34,10 +33,7 @@ public class UsersController : ControllerBase
         var valid = Validator.TryValidateObject(loginDto, new ValidationContext(loginDto), new List<ValidationResult>(),
             true);
         var answerDto = await _authService.LoginByEmail(loginDto);
-
-        if (answerDto.Success)
-            return Ok(answerDto);
-        else return BadRequest(answerDto);
+        return Ok(answerDto);
     }
 
     [HttpPost("refresh")]
@@ -45,8 +41,6 @@ public class UsersController : ControllerBase
     {
         var answer = await _authService.LoginByEmailRefresh(refreshDto);
 
-        if (answer.Success)
-            return Ok(answer);
-        return BadRequest(answer);
+        return Ok(answer);
     }
 }
