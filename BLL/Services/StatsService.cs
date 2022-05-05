@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BLL.Dtos.Lobby;
 using BLL.Dtos.Stats;
 using BLL.Interfaces;
 using BLL.Models.Stats;
 using DAL.Entities;
+using GeneralLibrary.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,10 @@ namespace BLL.Services;
 public class StatsService : ServiceBasePg, IStatsService
 {
     private readonly IMapper _mapper;
+
+    protected ILobbyService LobbyService => _lobbyService ??= HttpContext.RequestServices.GetService<ILobbyService>()!;
+
+    private ILobbyService? _lobbyService;
 
     protected IAuthService AuthService => _authService ??= HttpContext.RequestServices.GetService<IAuthService>()!;
 
@@ -24,21 +30,35 @@ public class StatsService : ServiceBasePg, IStatsService
 
     public async Task<LeaderboardWrapper> GetLeadersList()
     {
-        var ret = await Db.Users
-            .Select(u => new UserLeaderboardDto()
-            {
-                Id = u.Id, Name = u.Name, Elo = u.StatsOneVsOne.ELO,
-                CountOfBattles = u.StatsOneVsOne.BattlesCount + u.StatsTwoVsTwo.BattlesCountInAttack +
-                                 u.StatsTwoVsTwo.BattlesCountInDefense,
-                WinsCount = u.StatsOneVsOne.WinsCount + u.StatsTwoVsTwo.WinsCountInAttack +
-                            u.StatsTwoVsTwo.BattlesCountInDefense
-            }).ToListAsync();
+        var lobbyHash = await LobbyService.GetAllPlayingUsers();
+        var ret = await Db.Users.Include(u => u.StatsOneVsOne).Include(u => u.StatsTwoVsTwo)
+            .Select(u => new UserLeaderboardDto(u, lobbyHash))
+            .ToListAsync();
 
 
         return new LeaderboardWrapper()
         {
             Data = ret
         };
+    }
+
+    public async Task<UserLeaderboardDto?> GetLeader(Guid userId)
+    {
+        var lobbyHash = await LobbyService.GetAllPlayingUsers();
+        var user = await Db.Users.Where(u => u.Id == userId).Include(u => u.StatsOneVsOne)
+            .Include(u => u.StatsTwoVsTwo)
+            .FirstOrDefaultAsync();
+        if (user == null) return null;
+        return new UserLeaderboardDto(user, lobbyHash);
+    }
+
+
+    public async Task<LobbyUserShortInfo?> GetUserShortInfoPartial(Guid? userId)
+    {
+        if (userId == null) return null;
+        return await Db.Users.Include(u => u.StatsOneVsOne).Where(u => u.Id == userId)
+            .Select(u => new LobbyUserShortInfo() {Id = u.Id, Name = u.Name, Elo = u.StatsOneVsOne!.ELO})
+            .FirstOrDefaultAsync();
     }
 
     public async Task<UserDetailsDto?> GetUserDetails(Guid userGuid)

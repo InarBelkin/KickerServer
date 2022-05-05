@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\BLLAdapter\BLLAdapter.csproj" />
+        <ProjectReference Include="..\DAL\DAL.csproj" />
         <ProjectReference Include="..\GeneralLibrary\GeneralLibrary.csproj" />
     </ItemGroup>
 

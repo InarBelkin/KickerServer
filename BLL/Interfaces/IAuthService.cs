@@ -1,4 +1,5 @@
 using BLL.Dtos.Auth;
+using BLL.Dtos.Messages;
 using BLL.Models.Auth;
 
 namespace BLL.Interfaces;
@@ -10,4 +11,5 @@ public interface IAuthService
     public Task<LoginAnswerDto> LoginByEmailRefresh(LoginRefreshDto dto);
     public Task LogoutEverywhere(Guid userId);
     public UserClaimData? GetUserClaims();
+    Task<MessageBaseDto> Logout(LogoutDto dto);
 }

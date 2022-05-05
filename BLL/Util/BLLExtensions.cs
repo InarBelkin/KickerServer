@@ -2,10 +2,10 @@
 using System.Text;
 using BLL.Interfaces;
 using BLL.Services;
-using BLLAdapter.Util;
 using DAL.Util;
 using GeneralLibrary.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -18,10 +18,17 @@ public static class BLLExtensions
     {
         collection.AddScoped<IAuthService, AuthService>();
         collection.AddScoped<IStatsService, StatsService>();
+        collection.AddScoped<ILobbyService, LobbyService>();
+        collection.AddScoped<ILobbyMessagesService, LobbyMessagesService>();
+        
         collection.AddScoped<TokenService>();
-        collection.DalRegister(configuration);
+
         collection.AddAutoMapper(typeof(MapperProfile));
         collection.AuthRegister(configuration);
+
+        collection.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+        
+        collection.DalRegister(configuration);
     }
 
     private static void AuthRegister(this IServiceCollection collection, IConfiguration configuration)

@@ -7,7 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
+        <PackageReference Include="StackExchange.Redis" Version="2.5.61" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="InMemoryEntities" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GeneralLibrary\GeneralLibrary.csproj" />
     </ItemGroup>
 
 </Project>

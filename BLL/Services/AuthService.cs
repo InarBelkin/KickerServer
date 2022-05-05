@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using BLL.Dtos.Auth;
+using BLL.Dtos.Messages;
 using BLL.Interfaces;
 using BLL.Models.Auth;
 using DAL.Entities;
@@ -74,5 +75,16 @@ public partial class AuthService : ServiceBasePg, IAuthService
             Name = id.Value
         };
         return data;
+    }
+
+    public async Task<MessageBaseDto> Logout(LogoutDto dto)
+    {
+        var claims = HttpContext.User.Claims.ToList();
+        var id = claims.FirstOrDefault(u => u.Type == ClaimTypes.Sid);
+        var user = await Db.Users.Include(u => u.AuthInfos).FirstOrDefaultAsync(u => u.Id == Guid.Parse(id.Value));
+        var authInfo = user.AuthInfos.FirstOrDefault(a => a is AuthInfoMail) as AuthInfoMail;
+        authInfo.RefreshTokens = authInfo.RefreshTokens.Where(t => t != dto.RefreshToken).ToArray();
+        await Db.SaveChangesAsync();
+        return new MessageBaseDto() {Message = "You hav been logouted", Success = true};
     }
 }
