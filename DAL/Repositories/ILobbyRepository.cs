@@ -9,4 +9,5 @@ public interface ILobbyRepository
     Task<bool> DeleteItem(Guid initiatorId);
     Task<bool> UpdateItem(LobbyItem item);
     Task<LobbyItem?> GetLobbyByInitiator(Guid InitiatorId);
+    Task DeleteAll();
 }

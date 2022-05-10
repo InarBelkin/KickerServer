@@ -20,14 +20,16 @@ public static class BLLExtensions
         collection.AddScoped<IStatsService, StatsService>();
         collection.AddScoped<ILobbyService, LobbyService>();
         collection.AddScoped<ILobbyMessagesService, LobbyMessagesService>();
-        
+        collection.AddScoped<ILobbyUtilService, LobbyUtilService>();
+        collection.AddScoped<IBattleService, BattleService>();
+
         collection.AddScoped<TokenService>();
 
         collection.AddAutoMapper(typeof(MapperProfile));
         collection.AuthRegister(configuration);
 
         collection.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
-        
+
         collection.DalRegister(configuration);
     }
 

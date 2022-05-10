@@ -13,4 +13,5 @@ public interface IStatsService
 
     Task<UserLeaderboardDto?> GetLeader(Guid userId);
     Task<LobbyUserShortInfo?> GetUserShortInfoPartial(Guid? userId);
+    Task ApplyLobbyStats(LobbyItemM lobbyItemM);
 }

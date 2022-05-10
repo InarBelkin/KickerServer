@@ -9,7 +9,7 @@ public class UserLeaderboardDto
     {
     }
 
-    public UserLeaderboardDto(User user, HashSet<Guid> usersInBattle)
+    public UserLeaderboardDto(User user, Dictionary<Guid, UserStatus> usersStatuses)
     {
         Id = user.Id;
         Name = user.Name;
@@ -19,7 +19,7 @@ public class UserLeaderboardDto
         WinsCount = user.StatsOneVsOne.WinsCount + user.StatsTwoVsTwo.WinsCountInAttack +
                     user.StatsTwoVsTwo.BattlesCountInDefense;
 
-        this.Status = usersInBattle.Contains(Id) ? UserStatus.InBattle : UserStatus.Unknown;
+        this.Status = usersStatuses.ContainsKey(Id) ? usersStatuses[Id] : UserStatus.Offline;
     }
 
 

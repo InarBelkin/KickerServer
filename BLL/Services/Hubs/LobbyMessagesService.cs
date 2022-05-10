@@ -1,5 +1,8 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BLL.Dtos.Lobby;
 using BLL.Dtos.Lobby.Messages;
+using BLL.Dtos.Messages;
 using BLL.Interfaces;
 using BLL.Services.Hubs;
 using BLL.Util;
@@ -47,7 +50,34 @@ public class LobbyMessagesService : ILobbyMessagesService
         foreach (var user in lobbyItem.SideA.Concat(lobbyItem.SideB).Concat(new[] {lobbyItem.Initiator})
                      .Where(u => u.Id != null))
         {
-            await _hub.Clients.User(user.Id.ToString()!).YourLobbyChanged(lobbyItem);
+            var serializeOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            var json = JsonSerializer.Serialize(lobbyItem, serializeOptions);
+
+            await _hub.Clients.User(user.Id.ToString()!).YourLobbyChanged(json);
         }
+    }
+
+    public async Task YourLobbyWasDeleted(bool withResults, Guid battleId, Guid userId)
+    {
+        await _hub.Clients.User(userId.ToString()!).YourLobbyDeleted(withResults, battleId.ToString());
+    }
+
+    public async Task<MessageBaseDto> LeaveBattle(LeaveBattleDto dto)
+    {
+        return await LobbyService.ApplyLeaveBattle(dto);
+    }
+
+    public async Task<MessageBaseDto> EndBattleEarly(Guid initiatorId)
+    {
+        var lobby = await LobbyService.GetLobbyByInitiator(initiatorId);
+        if (lobby == null) return new() {Message = "batlle already doesnt exists", Success = false};
+
+        foreach (var user in lobby.GetAllUsers().Where(u => u.Id != null))
+            await _hub.Clients.User(user.Id!.Value.ToString()).YourLobbyDeleted(false, "");
+        return await LobbyService.DeleteLobby(initiatorId);
     }
 }

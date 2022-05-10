@@ -14,4 +14,5 @@ public enum IsAccepted
     Refused = 3,
     Kicked = 4,
     AllInvited = 5,
+    Left = 6
 }

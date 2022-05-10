@@ -17,5 +17,8 @@ public class MapperProfile : Profile
         CreateMap<LobbyItemM, LobbyItem>().ForMember(dest => dest.Initiator, opt =>
             opt.MapFrom(d => d.Initiator.Id));
         CreateMap<LobbyUserShortInfo, LobbyUser>();
+        CreateMap<LobbyTimeStampM, LobbyTimeStamp>();
+        CreateMap<LobbyResultM, LobbyResult>();
+        
     }
 }

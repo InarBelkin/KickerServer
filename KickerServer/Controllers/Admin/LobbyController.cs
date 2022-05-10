@@ -24,10 +24,18 @@ public class LobbyController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("lobby")]
-    public async Task<ActionResult<LobbyItemM?>> GetLobby()
+    [HttpGet("mylobby")]
+    public async Task<ActionResult<LobbyItemM?>> GetMyLobby()
     {
         return Ok(await _lobby.GetMyLobby());
+    }
+
+    [HttpGet("lobby/{initiatorId}")]
+    public async Task<ActionResult<LobbyItemM>> GetLobbyById(string initiatorId)
+    {
+        var guid = Guid.Parse(initiatorId);
+        var lobby = await _lobby.GetLobbyByInitiator(guid);
+        return lobby == null ? NotFound() : Ok(lobby);
     }
 
     [HttpGet]
@@ -51,10 +59,17 @@ public class LobbyController : ControllerBase
     }
 
 
-    [HttpDelete("{userId}")]
+    [HttpDelete("deleteOne/{userId}")]
     public async Task<ActionResult<MessageBaseDto>> DeleteLobby(string userId)
     {
         var guid = Guid.Parse(userId);
         return Ok(await _lobby.DeleteLobby(guid));
+    }
+
+    [HttpDelete("deleteAll")]
+    public async Task<ActionResult> DeleteAll()
+    {
+        await _lobby.DeleteAll();
+        return Ok();
     }
 }

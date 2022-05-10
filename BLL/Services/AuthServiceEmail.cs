@@ -97,6 +97,13 @@ public partial class AuthService : IAuthService
             };
 
         var user = await Db.Users.Where(u => u.Id == userId).Include(u => u.AuthInfos).FirstOrDefaultAsync();
+        if (user == null)
+            return new LoginAnswerDto()
+            {
+                Success = false,
+                Message = "Token was expired or incorrect"
+            };
+
         var authInfo = user.AuthInfos.FirstOrDefault(u => u is AuthInfoMail) as AuthInfoMail;
 
 
@@ -113,7 +120,7 @@ public partial class AuthService : IAuthService
             authInfo!.RefreshTokens = _tokenService.NewTokens(authInfo.RefreshTokens, dto.RefreshToken, refreshToken);
             Db.Entry(authInfo).State = EntityState.Modified;
             await Db.SaveChangesAsync();
-            
+
             return new LoginAnswerDto()
             {
                 Success = true,

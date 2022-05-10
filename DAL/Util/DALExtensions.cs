@@ -18,5 +18,6 @@ public static class DALExtensions
         services.AddSingleton<ConnectionMultiplexer>(multiplexer);
 
         services.AddScoped<ILobbyRepository, LobbyRepository>();
+        services.AddScoped<IConnectedUsersRepository, ConnectedUsersRepository>();
     }
 }

@@ -21,15 +21,17 @@ public class LobbyService : ILobbyService
     private readonly IStatsService _statsService;
     private readonly IAuthService _authService;
     private readonly ILobbyMessagesService _lobbyMessagesService;
+    private readonly IBattleService _battleService;
 
     public LobbyService(ILobbyRepository repository, IMapper mapper, IStatsService statsService,
-        IAuthService authService, ILobbyMessagesService lobbyMessagesService)
+        IAuthService authService, ILobbyMessagesService lobbyMessagesService, IBattleService battleService)
     {
         _repository = repository;
         _mapper = mapper;
         _statsService = statsService;
         _authService = authService;
         _lobbyMessagesService = lobbyMessagesService;
+        _battleService = battleService;
     }
 
 
@@ -79,22 +81,16 @@ public class LobbyService : ILobbyService
     private async Task<LobbyItemM> MapLobbyM(LobbyItem lobby, bool member) =>
         new()
         {
+            TimeStamps = lobby.TimeStamps.Select(t => new LobbyTimeStampM(t)).ToArray(),
+            Result = new LobbyResultM(lobby.Result),
+
             DateStart = lobby.DateStart,
             IAmMember = member,
             Message = lobby.Message,
             Initiator = (await _statsService.GetUserShortInfoPartial(lobby.Initiator))!,
-            SideA = await SequenceAwait(lobby.SideA.Select(async a => await GetLobbyUserShortInfo(a))),
-            SideB = await SequenceAwait(lobby.SideB.Select(async a => await GetLobbyUserShortInfo(a))),
+            SideA = await lobby.SideA.Select(async a => await GetLobbyUserShortInfo(a)).SequenceAwait(),
+            SideB = await lobby.SideB.Select(async a => await GetLobbyUserShortInfo(a)).SequenceAwait(),
         };
-
-    private async Task<List<TResult>> SequenceAwait<TResult>(IEnumerable<Task<TResult>> tasks)
-    {
-        var ret = new List<TResult>();
-
-        foreach (var task in tasks) ret.Add(await task);
-
-        return ret;
-    }
 
     private async Task<LobbyUserShortInfo> GetLobbyUserShortInfo(LobbyUser lobbyUser)
     {
@@ -110,6 +106,8 @@ public class LobbyService : ILobbyService
 
     public async Task<MessageBaseDto> StartLobby(LobbyItemM item)
     {
+        if (item.Initiator.Id == null) return new() {Success = false, Message = "initiator was null"};
+
         var lobby = _mapper.Map<LobbyItem>(item);
         var success = await _repository.AddLobbyItem(lobby);
         return new MessageBaseDto()
@@ -134,7 +132,7 @@ public class LobbyService : ILobbyService
 
             var lobby = _mapper.Map<LobbyItem>(item);
             var success = await _repository.UpdateItem(lobby);
-            await _lobbyMessagesService.YourLobbyWasUpdated(item);
+            await _lobbyMessagesService.YourLobbyWasUpdated(await MapLobbyM(lobby, false));
             return new MessageBaseDto()
             {
                 Success = true,
@@ -152,9 +150,11 @@ public class LobbyService : ILobbyService
         }
     }
 
+
     public async Task<MessageBaseDto> DeleteLobby(Guid userId)
     {
         var success = await _repository.DeleteItem(userId);
+
         return new MessageBaseDto()
         {
             Success = success,
@@ -162,13 +162,9 @@ public class LobbyService : ILobbyService
         };
     }
 
-    public async Task<HashSet<Guid>> GetAllPlayingUsers()
+    public async Task DeleteAll()
     {
-        var lobbys = await _repository.GetLobbyList();
-        return lobbys.SelectMany(l =>
-                l.SideA.Concat(l.SideB).Where(s => s.Id != null && s.Accepted == IsAccepted.Accepted)
-                    .Select(s => s.Id!.Value).Concat(new[] {l.Initiator}))
-            .ToHashSet();
+        await _repository.DeleteAll();
     }
 
     public async Task<MessageBaseDto> ApplyUserInviteAnswer(InviteAnswer answer)
@@ -176,26 +172,30 @@ public class LobbyService : ILobbyService
         var lobby = await GetLobbyByInitiator(answer.InitiatorId);
         if (lobby != null)
         {
-            var user = lobby.SideA.Concat(lobby.SideB).FirstOrDefault(u => u.Id == answer.InvitedId);
-            if (user != null)
+            var side = answer.Side == 0 ? lobby.SideA : lobby.SideB;
+            var user = side[answer.Position];
+
+            switch (user.Accepted)
             {
-                user.Accepted = answer.Accepted ? IsAccepted.Accepted : IsAccepted.Refused;
-                return await UpdateLobby(lobby);
-            }
-            else
-            {
-                var side = answer.Side == 0 ? lobby.SideA : lobby.SideB;
-                if (side[answer.Position].Accepted == IsAccepted.AllInvited && answer.Accepted == true)
-                {
-                    side[answer.Position].Id = answer.InvitedId;
-                    side[answer.Position].Accepted = IsAccepted.Accepted;
-                    return await UpdateLobby(lobby);
-                }
-                else
+                case IsAccepted.Invited when user.Id == answer.InvitedId:
+                    side[answer.Position].Accepted = answer.Accepted ? IsAccepted.Accepted : IsAccepted.Refused;
+                    var message = await UpdateLobby(lobby);
+                    return message;
+                case IsAccepted.Invited:
                     return new MessageBaseDto()
                     {
                         Success = false,
-                        Message = "cant accept"
+                        Message = "This place is not for you, molodoy thzelovek"
+                    };
+                case IsAccepted.AllInvited when answer.Accepted == true:
+                    side[answer.Position].Id = answer.InvitedId;
+                    side[answer.Position].Accepted = IsAccepted.Accepted;
+                    return await UpdateLobby(lobby);
+                case IsAccepted.AllInvited:
+                    return new MessageBaseDto()
+                    {
+                        Success = false,
+                        Message = "It's don't necessary to apply cancel invite to all"
                     };
             }
         }
@@ -205,5 +205,50 @@ public class LobbyService : ILobbyService
             Success = false,
             Message = "Lobby doesn't exists"
         };
+    }
+
+    public async Task<MessageBaseDto> ApplyLeaveBattle(LeaveBattleDto dto)
+    {
+        var lobby = await GetLobbyByInitiator(dto.InitiatorId);
+        if (lobby != null)
+        {
+            var user = lobby.SideA.Concat(lobby.SideB).FirstOrDefault(u => u.Id == dto.InvitedId);
+            if (user is {Accepted: IsAccepted.Accepted})
+            {
+                user.Accepted = IsAccepted.Left;
+                var message = await UpdateLobby(lobby);
+                return message;
+            }
+
+            return new MessageBaseDto()
+            {
+                Success = false,
+                Message = "You are trying to left the battle, but you're not in it or place is right"
+            };
+        }
+
+        return new MessageBaseDto()
+        {
+            Success = false,
+            Message = "Lobby doesn't exists"
+        };
+    }
+
+    public async Task<BattleAnswerDto> EndOfBattle(LobbyItemM lobby)
+    {
+        if (lobby.Result.IsWinnerA == null) return new() {Success = false, Message = "winner must be selected"};
+
+        if (lobby.SideA.All(u => u.Id != null) &&
+            lobby.SideB.All(u => u.Id != null && u.Accepted == IsAccepted.Accepted))
+            await _statsService.ApplyLobbyStats(lobby);
+
+        var battleId = await _battleService.AddBattle(lobby);
+
+        foreach (var user in lobby.SideA.Concat(lobby.SideB).Where(u => u.Id != null))
+            await _lobbyMessagesService.YourLobbyWasDeleted(true, battleId, user.Id!.Value);
+
+        await DeleteLobby(lobby.Initiator.Id!.Value);
+
+        return new() {Success = true, Message = "battle results was written", BattleId = battleId};
     }
 }

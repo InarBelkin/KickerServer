@@ -8,6 +8,6 @@ public interface ITypedInvitationHub
     Task Invite(InviteMessage message);
     Task AnswerInvite(InviteAnswer answer);
 
-    Task YourLobbyChanged(LobbyItemM lobbyItem);
-    Task YourLobbyDeleted();
+    Task YourLobbyChanged(string lobbyItem);
+    Task YourLobbyDeleted(bool withResults, string BattleId);
 }

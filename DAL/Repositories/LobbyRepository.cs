@@ -1,5 +1,6 @@
 using System.Text.Json;
 using DAL.InMemoryEntities.Lobby;
+using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
 namespace DAL.Repositories;
@@ -41,6 +42,11 @@ public class LobbyRepository : ILobbyRepository
 
     public async Task<bool> DeleteItem(Guid initiatorId) =>
         await Db.HashDeleteAsync(LobbyHashKey, initiatorId.ToString());
+
+    public async Task DeleteAll()
+    {
+        await Db.KeyDeleteAsync(LobbyHashKey);
+    }
 
     public async Task<bool> UpdateItem(LobbyItem item)
     {

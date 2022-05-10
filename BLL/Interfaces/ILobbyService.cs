@@ -12,6 +12,9 @@ public interface ILobbyService
     Task<MessageBaseDto> StartLobby(LobbyItemM item);
     Task<MessageBaseDto> UpdateLobby(LobbyItemM item);
     Task<LobbyItemM?> GetMyLobby();
-    Task<HashSet<Guid>> GetAllPlayingUsers();
     Task<MessageBaseDto> ApplyUserInviteAnswer(InviteAnswer answer);
+    Task<LobbyItemM?> GetLobbyByInitiator(Guid initiatorId);
+    Task<MessageBaseDto> ApplyLeaveBattle(LeaveBattleDto dto);
+    Task<BattleAnswerDto> EndOfBattle(LobbyItemM lobby);
+    Task DeleteAll();
 }

@@ -44,6 +44,5 @@ public class MapTest
             SideB = {new LobbyUserShortInfo()},
         };
         var lobby = mapper.Map<LobbyItem>(lobbyM);
-        var stupeDASFASDFDASF = "sUKA RABAGOPIJFAGDSKLHJFASDZG";
     }
 }
