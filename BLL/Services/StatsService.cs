@@ -5,6 +5,7 @@ using BLL.Interfaces;
 using BLL.Models.Stats;
 using DAL.Entities;
 using GeneralLibrary.Enums;
+using GeneralLibrary.Extensions;
 using GeneralLibrary.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -102,6 +103,9 @@ public sealed class StatsService : ServiceBasePg, IStatsService
         var usersA = await request.Where(u => usersIdsA.Contains(u.Id)).ToListAsync();
         var usersB = await request.Where(u => usersIdsB.Contains(u.Id)).ToListAsync();
 
+        var allUsers = usersA.Concat(usersB);
+
+        var battleSize = usersA.Count;
         for (int i = 0; i < usersA.Count; i++)
         {
             usersA[i].StatsOneVsOne!.ELO =
@@ -109,8 +113,45 @@ public sealed class StatsService : ServiceBasePg, IStatsService
             usersB[i].StatsOneVsOne!.ELO =
                 Mathematics.CountNewElo(usersB[i].StatsOneVsOne!.ELO, usersA[0].StatsOneVsOne!.ELO, !isAWon);
         }
-        
-        
+
+        if (battleSize == 1)
+        {
+            usersA[0].StatsOneVsOne!.Also(u =>
+            {
+                u.BattlesCount++;
+                if (isAWon) u.WinsCount++;
+            });
+
+            usersB[0].StatsOneVsOne!.Also(u =>
+            {
+                u.BattlesCount++;
+                if (!isAWon) u.WinsCount++;
+            });
+        }
+        else
+        {
+            usersA[0].StatsTwoVsTwo!.Also(u =>
+            {
+                u.BattlesCountInAttack++;
+                if (isAWon) u.WinsCountInAttack++;
+            });
+            usersA[1].StatsTwoVsTwo!.Also(u =>
+            {
+                u.BattlesCountInDefense++;
+                if (isAWon) u.WinsCountInDefense++;
+            });
+
+            usersB[0].StatsTwoVsTwo!.Also(u =>
+            {
+                u.BattlesCountInAttack++;
+                if (isAWon) u.WinsCountInAttack++;
+            });
+            usersB[1].StatsTwoVsTwo!.Also(u =>
+            {
+                u.BattlesCountInDefense++;
+                if (isAWon) u.WinsCountInDefense++;
+            });
+        }
 
         await Db.SaveChangesAsync();
     }

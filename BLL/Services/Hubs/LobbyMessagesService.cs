@@ -37,6 +37,8 @@ public class LobbyMessagesService : ILobbyMessagesService
     public async Task InviteAll(InviteMessage message)
     {
         await _hub.Clients.All.Invite(message);
+
+        //await _hub.Clients.AllExcept()
     }
 
     public async Task AnswerToInvite(InviteAnswer answer)

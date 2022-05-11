@@ -52,7 +52,12 @@ public class BattleService : ServiceBasePg, IBattleService
     {
         var battle = await Db.Battles.Include(b => b.Users).FirstOrDefaultAsync(b => b.Id == id);
 
+        
         var lobby = new LobbyItemM(battle!);
+        foreach (var lobbyTimeStampM in lobby.TimeStamps)
+        {
+            lobbyTimeStampM.GlobalTime = DateTime.SpecifyKind(lobbyTimeStampM.GlobalTime, DateTimeKind.Unspecified);
+        }
 
         return lobby;
     }

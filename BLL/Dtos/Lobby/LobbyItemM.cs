@@ -16,8 +16,8 @@ public class LobbyItemM : IValidatableObject
     public LobbyItemM(Battle battle)
     {
         Message = battle.Message;
-        var uInitiator = battle.UserBattles.FirstOrDefault(ub => ub.IsInitiator)!.User!;
-        Initiator = new(uInitiator);
+        // var uInitiator = battle.UserBattles.FirstOrDefault(ub => ub.IsInitiator)!.User!;
+        //  Initiator = new(uInitiator);
         SideA = battle.UserBattles.Where(ub => ub.Side == 0)
             .Select(ub => new LobbyUserShortInfo(ub.User!)).ToList();
         SideB = battle.UserBattles.Where(ub => ub.Side == 1)
@@ -30,6 +30,7 @@ public class LobbyItemM : IValidatableObject
                 BattleState = BattleStatus.Ended, BattleTime = battle.BattleTimeSeconds, GlobalTime = battle.BattleTime
             }
         };
+        Result = new() {IsWinnerA = battle.IsWinnerA, CountOfGoalsLoser = battle.LoserGoalsCount};
     }
 
     public LobbyTimeStampM[] TimeStamps { get; set; } = Array.Empty<LobbyTimeStampM>();

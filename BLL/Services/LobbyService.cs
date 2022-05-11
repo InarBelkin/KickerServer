@@ -238,8 +238,7 @@ public class LobbyService : ILobbyService
     {
         if (lobby.Result.IsWinnerA == null) return new() {Success = false, Message = "winner must be selected"};
 
-        if (lobby.SideA.All(u => u.Id != null) &&
-            lobby.SideB.All(u => u.Id != null && u.Accepted == IsAccepted.Accepted))
+        if (lobby.SideA.Concat(lobby.SideB).All(u => u.Id != null && u.Accepted == IsAccepted.Accepted))
             await _statsService.ApplyLobbyStats(lobby);
 
         var battleId = await _battleService.AddBattle(lobby);
