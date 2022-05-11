@@ -71,12 +71,15 @@ public sealed class StatsService : ServiceBasePg, IStatsService
 
     public async Task<UserDetailsDto?> GetUserDetails(Guid userGuid)
     {
+        var userStatuses = await LobbyUtilService.GetUserStatuses();
         var user = await Db.Users.Where(u => u.Id == userGuid).Include(u => u.StatsOneVsOne)
             .Include(u => u.StatsTwoVsTwo)
             .FirstOrDefaultAsync();
         if (user == null) return null;
 
         var userDto = _mapper.Map<User, UserDetailsDto>(user);
+        userDto.Status = userStatuses.ContainsKey(user.Id) ? userStatuses[user.Id] : UserStatus.Offline;
+        
         var myId = AuthService.GetUserClaims()?.Id;
         userDto.IsMe = myId != null && myId == userDto.Id;
 
