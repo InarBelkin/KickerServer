@@ -43,17 +43,27 @@ public class BattleService : ServiceBasePg, IBattleService
                     IsInitiator = lobby.SideB[i].Id!.Value == lobby.Initiator.Id
                 });
 
+        if (battle.UserBattles.Count(ub => ub.UserId == lobby.Initiator.Id) == 0)
+        {
+            battle.UserBattles.Add(new()
+            {
+                Side = -1, Role = -1, UserId = lobby.Initiator.Id!.Value, IsInitiator = true
+            });
+        }
+
         Db.Battles.Add(battle);
         await Db.SaveChangesAsync();
         return battle.Id;
     }
 
-    public async Task<LobbyItemM> GetBattle(Guid id)
+    public async Task<LobbyItemM?> GetBattle(Guid id)
     {
-        var battle = await Db.Battles.Include(b => b.Users).FirstOrDefaultAsync(b => b.Id == id);
+        var battle = await Db.Battles.Include(b => b.Users).ThenInclude(u => u.StatsOneVsOne)
+            .FirstOrDefaultAsync(b => b.Id == id);
+        if (battle == null) return null;
 
-        
-        var lobby = new LobbyItemM(battle!);
+        var lobby = new LobbyItemM(battle);
+
         foreach (var lobbyTimeStampM in lobby.TimeStamps)
         {
             lobbyTimeStampM.GlobalTime = DateTime.SpecifyKind(lobbyTimeStampM.GlobalTime, DateTimeKind.Unspecified);

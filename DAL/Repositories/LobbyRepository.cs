@@ -30,6 +30,7 @@ public class LobbyRepository : ILobbyRepository
     public async Task<LobbyItem?> GetLobbyByInitiator(Guid InitiatorId)
     {
         var lobbyString = await Db.HashGetAsync(LobbyHashKey, InitiatorId.ToString());
+        if (lobbyString.ToString() == null) return null;
         return JsonSerializer.Deserialize<LobbyItem>(lobbyString);
     }
 

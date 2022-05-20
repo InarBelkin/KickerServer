@@ -48,5 +48,9 @@ public class KickerContext : DbContext
                     j.ToTable("UserBattles");
                 });
         modelBuilder.Entity<StatsOneVsOne>().Property(s => s.ELO).HasDefaultValue(1000);
+        // modelBuilder.Entity<Battle>().HasOne(b => b.Initiator).WithMany(u => u.BattlesWhereYouInitiator)
+        //     .HasForeignKey(b => b.InitiatorId);
+        //
+        // modelBuilder.Entity<User>().HasMany(u=>u.BattlesWhereYouInitiator).
     }
 }

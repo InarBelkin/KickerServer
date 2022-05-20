@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using static System.String;
 
 namespace DAL.Entities.Battle;

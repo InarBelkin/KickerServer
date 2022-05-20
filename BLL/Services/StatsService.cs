@@ -79,7 +79,7 @@ public sealed class StatsService : ServiceBasePg, IStatsService
 
         var userDto = _mapper.Map<User, UserDetailsDto>(user);
         userDto.Status = userStatuses.ContainsKey(user.Id) ? userStatuses[user.Id] : UserStatus.Offline;
-        
+
         var myId = AuthService.GetUserClaims()?.Id;
         userDto.IsMe = myId != null && myId == userDto.Id;
 
@@ -97,6 +97,7 @@ public sealed class StatsService : ServiceBasePg, IStatsService
     public async Task ApplyLobbyStats(LobbyItemM lobbyItemM)
     {
         var isAWon = lobbyItemM.Result.IsWinnerA!.Value;
+        var countOfGoalsLoser = lobbyItemM.Result.CountOfGoalsLoser;
         var usersIdsA = lobbyItemM.SideA.Select(u => u.Id!.Value);
         var usersIdsB = lobbyItemM.SideB.Select(u => u.Id!.Value);
 
@@ -111,10 +112,22 @@ public sealed class StatsService : ServiceBasePg, IStatsService
         var battleSize = usersA.Count;
         for (int i = 0; i < usersA.Count; i++)
         {
-            usersA[i].StatsOneVsOne!.ELO =
-                Mathematics.CountNewElo(usersA[i].StatsOneVsOne!.ELO, usersB[0].StatsOneVsOne!.ELO, isAWon);
-            usersB[i].StatsOneVsOne!.ELO =
-                Mathematics.CountNewElo(usersB[i].StatsOneVsOne!.ELO, usersA[0].StatsOneVsOne!.ELO, !isAWon);
+            var changes = Mathematics.ChangesInElo(usersA[i].StatsOneVsOne!.ELO, usersB[i].StatsOneVsOne!.ELO);
+            if (isAWon)
+            {
+                usersA[i].StatsOneVsOne!.ELO += changes;
+                usersB[i].StatsOneVsOne!.ELO -= changes;
+            }
+            else
+            {
+                usersA[i].StatsOneVsOne!.ELO -= changes;
+                usersB[i].StatsOneVsOne!.ELO += changes;
+            }
+
+            // usersA[i].StatsOneVsOne!.ELO =
+            //     Mathematics.CountNewElo(usersA[i].StatsOneVsOne!.ELO, usersB[0].StatsOneVsOne!.ELO, isAWon);
+            // usersB[i].StatsOneVsOne!.ELO =
+            //     Mathematics.CountNewElo(usersB[i].StatsOneVsOne!.ELO, usersA[0].StatsOneVsOne!.ELO, !isAWon);
         }
 
         if (battleSize == 1)
@@ -123,12 +136,14 @@ public sealed class StatsService : ServiceBasePg, IStatsService
             {
                 u.BattlesCount++;
                 if (isAWon) u.WinsCount++;
+                u.GoalsCount += isAWon ? 10 : countOfGoalsLoser;
             });
 
             usersB[0].StatsOneVsOne!.Also(u =>
             {
                 u.BattlesCount++;
                 if (!isAWon) u.WinsCount++;
+                u.GoalsCount += isAWon ? countOfGoalsLoser : 10;
             });
         }
         else

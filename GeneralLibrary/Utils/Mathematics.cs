@@ -10,4 +10,10 @@ public static class Mathematics
         var RnewA = Ra + K * (Sa - Ea);
         return (int) RnewA;
     }
+
+    public static int ChangesInElo(double Ra, double Rb)
+    {
+        var res = (int) Ra - CountNewElo(Ra, Rb, true);
+        return Math.Abs(res);
+    }
 }

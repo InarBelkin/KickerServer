@@ -20,6 +20,7 @@ public class BattleController : ControllerBase
     {
         var id = Guid.Parse(stringId);
         var res = await _battleService.GetBattle(id);
+        if (res == null) return NotFound();
         return Ok(res);
     }
 }
