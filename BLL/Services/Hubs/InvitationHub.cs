@@ -42,6 +42,4 @@ public class InvitationHub : Hub<ITypedInvitationHub>
     {
         await LobbyMessagesService.AnswerToInvite(answer);
     }
-    
-    
 }

@@ -44,7 +44,7 @@ public class KickerContext : DbContext
                     .HasForeignKey(pt => pt.BattleId),
                 j =>
                 {
-                    j.HasKey(t => new {t.BattleId, t.UserId});
+                    j.HasKey(t => new { t.BattleId, t.UserId });
                     j.ToTable("UserBattles");
                 });
         modelBuilder.Entity<StatsOneVsOne>().Property(s => s.ELO).HasDefaultValue(1000);

@@ -16,10 +16,10 @@ public class LobbyTest
     {
         var list = new List<LobbyUserShortInfo>()
         {
-            new() {Id = null, Name = "inar"},
-            new() {Id = null, Name = "nochun"},
-            new() {Id = Guid.Empty, Name = "Ella"},
-            new() {Id = Guid.Empty, Name = "Ella2"}
+            new() { Id = null, Name = "inar" },
+            new() { Id = null, Name = "nochun" },
+            new() { Id = Guid.Empty, Name = "Ella" },
+            new() { Id = Guid.Empty, Name = "Ella2" }
         };
         var rez = list.Distinct(new LobbyUserShortInfoEqualityComparer()).ToList();
         var count = rez.Count();
@@ -33,13 +33,13 @@ public class LobbyTest
         {
             SideA =
             {
-                new() {Id = null, Name = "inar", Accepted = IsAccepted.Accepted},
-                new() {Id = null, Name = "nochun", Accepted = IsAccepted.Accepted},
+                new() { Id = null, Name = "inar", Accepted = IsAccepted.Accepted },
+                new() { Id = null, Name = "nochun", Accepted = IsAccepted.Accepted },
             },
             SideB =
             {
-                new() {Id = Guid.Empty, Name = "Ella", Accepted = IsAccepted.Accepted},
-                new() {Id = Guid.Empty, Name = "Ella2", Accepted = IsAccepted.Accepted}
+                new() { Id = Guid.Empty, Name = "Ella", Accepted = IsAccepted.Accepted },
+                new() { Id = Guid.Empty, Name = "Ella2", Accepted = IsAccepted.Accepted }
             }
         };
 

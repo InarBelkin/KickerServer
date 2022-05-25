@@ -14,5 +14,4 @@ public class User : BaseEntity
 
     public List<Battle.Battle> Battles { get; set; } = new();
     public List<UserBattle> UserBattles { get; set; } = new();
-    
 }

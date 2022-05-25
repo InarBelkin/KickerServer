@@ -30,7 +30,7 @@ public class LobbyItemM : IValidatableObject
                 BattleState = BattleStatus.Ended, BattleTime = battle.BattleTimeSeconds, GlobalTime = battle.BattleTime
             }
         };
-        Result = new() {IsWinnerA = battle.IsWinnerA, CountOfGoalsLoser = battle.LoserGoalsCount};
+        Result = new() { IsWinnerA = battle.IsWinnerA, CountOfGoalsLoser = battle.LoserGoalsCount };
     }
 
     public LobbyTimeStampM[] TimeStamps { get; set; } = Array.Empty<LobbyTimeStampM>();
@@ -46,7 +46,7 @@ public class LobbyItemM : IValidatableObject
     public List<LobbyUserShortInfo> SideB { get; set; } = new();
 
 
-    public IEnumerable<LobbyUserShortInfo> GetAllUsers() => SideA.Concat(SideB).Concat(new[] {Initiator});
+    public IEnumerable<LobbyUserShortInfo> GetAllUsers() => SideA.Concat(SideB).Concat(new[] { Initiator });
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

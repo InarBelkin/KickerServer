@@ -106,7 +106,7 @@ public class LobbyService : ILobbyService
 
     public async Task<MessageBaseDto> StartLobby(LobbyItemM item)
     {
-        if (item.Initiator.Id == null) return new() {Success = false, Message = "initiator was null"};
+        if (item.Initiator.Id == null) return new() { Success = false, Message = "initiator was null" };
 
         var lobby = _mapper.Map<LobbyItem>(item);
         var success = await _repository.AddLobbyItem(lobby);
@@ -213,7 +213,7 @@ public class LobbyService : ILobbyService
         if (lobby != null)
         {
             var user = lobby.SideA.Concat(lobby.SideB).FirstOrDefault(u => u.Id == dto.InvitedId);
-            if (user is {Accepted: IsAccepted.Accepted})
+            if (user is { Accepted: IsAccepted.Accepted })
             {
                 user.Accepted = IsAccepted.Left;
                 var message = await UpdateLobby(lobby);
@@ -236,7 +236,7 @@ public class LobbyService : ILobbyService
 
     public async Task<BattleAnswerDto> EndOfBattle(LobbyItemM lobby)
     {
-        if (lobby.Result.IsWinnerA == null) return new() {Success = false, Message = "winner must be selected"};
+        if (lobby.Result.IsWinnerA == null) return new() { Success = false, Message = "winner must be selected" };
 
         if (lobby.SideA.Concat(lobby.SideB).All(u => u.Id != null && u.Accepted == IsAccepted.Accepted))
             await _statsService.ApplyLobbyStats(lobby);
@@ -248,6 +248,6 @@ public class LobbyService : ILobbyService
 
         await DeleteLobby(lobby.Initiator.Id!.Value);
 
-        return new() {Success = true, Message = "battle results was written", BattleId = battleId};
+        return new() { Success = true, Message = "battle results was written", BattleId = battleId };
     }
 }

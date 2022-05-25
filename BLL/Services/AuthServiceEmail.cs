@@ -33,7 +33,8 @@ public partial class AuthService : IAuthService
             Name = regDto.Name,
             AuthInfos =
             {
-                new AuthInfoMailM() {Email = regDto.Email.ToLower().Trim(' '), HashPassword = HashPass(regDto.Password)}
+                new AuthInfoMailM()
+                    { Email = regDto.Email.ToLower().Trim(' '), HashPassword = HashPass(regDto.Password) }
             }
         });
 
@@ -61,7 +62,8 @@ public partial class AuthService : IAuthService
             .FirstOrDefaultAsync();
 
         if (authInfoMail?.User == null)
-            return new LoginAnswerDto() {Success = false, Message = "User doesn't not exists or password is incorrect"};
+            return new LoginAnswerDto()
+                { Success = false, Message = "User doesn't not exists or password is incorrect" };
 
         var claims = new List<Claim>
         {
@@ -72,7 +74,7 @@ public partial class AuthService : IAuthService
         var accessToken = _tokenService.AccessToken(claims);
         var refreshToken = _tokenService.RefreshToken(claims);
 
-        authInfoMail.RefreshTokens = authInfoMail.RefreshTokens.Concat(new[] {refreshToken}).ToArray();
+        authInfoMail.RefreshTokens = authInfoMail.RefreshTokens.Concat(new[] { refreshToken }).ToArray();
         Db.Entry(authInfoMail).State = EntityState.Modified;
         await Db.SaveChangesAsync();
 

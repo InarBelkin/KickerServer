@@ -39,7 +39,7 @@ public class LobbyUtilService : ILobbyUtilService
         var lobbys = await _lobbyRepository.GetLobbyList();
         var inBattleUsers = lobbys.SelectMany(l =>
             l.SideA.Concat(l.SideB).Where(s => s.Id != null && s.Accepted == IsAccepted.Accepted)
-                .Select(s => s.Id!.Value).Concat(new[] {l.Initiator}));
+                .Select(s => s.Id!.Value).Concat(new[] { l.Initiator }));
         foreach (var battleUser in inBattleUsers)
         {
             ret[battleUser] = UserStatus.InBattle;

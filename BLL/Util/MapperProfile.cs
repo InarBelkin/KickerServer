@@ -19,6 +19,5 @@ public class MapperProfile : Profile
         CreateMap<LobbyUserShortInfo, LobbyUser>();
         CreateMap<LobbyTimeStampM, LobbyTimeStamp>();
         CreateMap<LobbyResultM, LobbyResult>();
-        
     }
 }

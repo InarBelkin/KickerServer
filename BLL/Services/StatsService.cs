@@ -65,7 +65,7 @@ public sealed class StatsService : ServiceBasePg, IStatsService
     {
         if (userId == null) return null;
         return await Db.Users.Include(u => u.StatsOneVsOne).Where(u => u.Id == userId)
-            .Select(u => new LobbyUserShortInfo() {Id = u.Id, Name = u.Name, Elo = u.StatsOneVsOne!.ELO})
+            .Select(u => new LobbyUserShortInfo() { Id = u.Id, Name = u.Name, Elo = u.StatsOneVsOne!.ELO })
             .FirstOrDefaultAsync();
     }
 

@@ -49,7 +49,7 @@ public class LobbyMessagesService : ILobbyMessagesService
 
     public async Task YourLobbyWasUpdated(LobbyItemM lobbyItem)
     {
-        foreach (var user in lobbyItem.SideA.Concat(lobbyItem.SideB).Concat(new[] {lobbyItem.Initiator})
+        foreach (var user in lobbyItem.SideA.Concat(lobbyItem.SideB).Concat(new[] { lobbyItem.Initiator })
                      .Where(u => u.Id != null))
         {
             var serializeOptions = new JsonSerializerOptions
@@ -76,7 +76,7 @@ public class LobbyMessagesService : ILobbyMessagesService
     public async Task<MessageBaseDto> EndBattleEarly(Guid initiatorId)
     {
         var lobby = await LobbyService.GetLobbyByInitiator(initiatorId);
-        if (lobby == null) return new() {Message = "batlle already doesnt exists", Success = false};
+        if (lobby == null) return new() { Message = "batlle already doesnt exists", Success = false };
 
         foreach (var user in lobby.GetAllUsers().Where(u => u.Id != null))
             await _hub.Clients.User(user.Id!.Value.ToString()).YourLobbyDeleted(false, "");

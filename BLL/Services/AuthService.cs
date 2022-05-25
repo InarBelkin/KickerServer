@@ -46,10 +46,10 @@ public partial class AuthService : ServiceBasePg, IAuthService
             switch (authInfoM)
             {
                 case AuthInfoFirebaseM firebaseM:
-                    dbUser.AuthInfos.Add(new AuthInfoFirebase() {FirebaseUuid = firebaseM.FirebaseUuid});
+                    dbUser.AuthInfos.Add(new AuthInfoFirebase() { FirebaseUuid = firebaseM.FirebaseUuid });
                     break;
                 case AuthInfoMailM mailM:
-                    dbUser.AuthInfos.Add(new AuthInfoMail() {Email = mailM.Email, HashPassword = mailM.HashPassword});
+                    dbUser.AuthInfos.Add(new AuthInfoMail() { Email = mailM.Email, HashPassword = mailM.HashPassword });
                     break;
             }
 
@@ -85,6 +85,6 @@ public partial class AuthService : ServiceBasePg, IAuthService
         var authInfo = user.AuthInfos.FirstOrDefault(a => a is AuthInfoMail) as AuthInfoMail;
         authInfo.RefreshTokens = authInfo.RefreshTokens.Where(t => t != dto.RefreshToken).ToArray();
         await Db.SaveChangesAsync();
-        return new MessageBaseDto() {Message = "You hav been logouted", Success = true};
+        return new MessageBaseDto() { Message = "You hav been logouted", Success = true };
     }
 }

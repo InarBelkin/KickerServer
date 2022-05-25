@@ -25,8 +25,8 @@ public class MapTest
 
         User user = new User()
         {
-            Name = "Inar", Id = Guid.Empty, StatsOneVsOne = new() {BattlesCount = 123},
-            StatsTwoVsTwo = new() {ELO = 999}
+            Name = "Inar", Id = Guid.Empty, StatsOneVsOne = new() { BattlesCount = 123 },
+            StatsTwoVsTwo = new() { ELO = 999 }
         };
 
         var userDetail = mapper.Map<User, UserDetailsDto>(user);
@@ -40,8 +40,8 @@ public class MapTest
 
         var lobbyM = new LobbyItemM()
         {
-            SideA = {new LobbyUserShortInfo()},
-            SideB = {new LobbyUserShortInfo()},
+            SideA = { new LobbyUserShortInfo() },
+            SideB = { new LobbyUserShortInfo() },
         };
         var lobby = mapper.Map<LobbyItem>(lobbyM);
     }

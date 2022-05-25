@@ -12,7 +12,7 @@ public class UserDetailsDto
     public string Name { get; set; } = Empty;
     public bool IsMe { get; set; } = false;
     public UserStatus Status { get; set; }
-    
+
     public StatsOneVsOneM StatsOneVsOne { get; set; } = new();
     public StatsTwoVsTwoM StatsTwoVsTwo { get; set; } = new();
 }

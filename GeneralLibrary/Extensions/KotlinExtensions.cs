@@ -3,7 +3,7 @@ namespace GeneralLibrary.Extensions;
 public static class KotlinExtensions
 {
     // Kotlin: fun <T, R> T.let(block: (T) -> R): R
-    public static R Let<T, R>(this T self, Func<T, R> block) 
+    public static R Let<T, R>(this T self, Func<T, R> block)
     {
         return block(self);
     }
@@ -13,5 +13,5 @@ public static class KotlinExtensions
     {
         block(self);
         return self;
-    }   
+    }
 }
