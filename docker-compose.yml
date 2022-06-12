@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  kickerserver:
+    image: ${DOCKER_REGISTRY-}kickerserver
+    ports:
+      - "3100:80"
+    build:
+      context: .
+      dockerfile: KickerServer/Dockerfile
+    environment:
+      "ConnectionStrings__RedisConnection": "redis:6379"
+  
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - kicker-redis:/data
+  postgres:
+    image: postgres:latest
+    volumes:
+      - kicker-pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: admin
+
+volumes:
+  kicker-redis:
+  kicker-pg:
