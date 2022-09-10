@@ -24,7 +24,7 @@ public class TokenService : ServiceBasePg
     public string AccessToken(IEnumerable<Claim> claims)
     {
         var jwt = new JwtSecurityToken(issuer: _jwtOptions.Issuer,
-            audience: _jwtOptions.Audience, claims: claims, expires: DateTime.UtcNow.Add(TimeSpan.FromDays(1)),
+            audience: _jwtOptions.Audience, claims: claims, expires: DateTime.UtcNow.Add(TimeSpan.FromDays(7)),
             signingCredentials: new SigningCredentials(_jwtOptions.GetSymmetricSecurityKey(),
                 SecurityAlgorithms.HmacSha256)
         );
@@ -66,7 +66,7 @@ public class TokenService : ServiceBasePg
         return id != null ? Guid.Parse(id!) : null;
     }
 
-    public string[] NewTokens(string[] oldTokens,string oldToken, string newToken)
+    public string[] NewTokens(string[] oldTokens, string oldToken, string newToken)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -93,7 +93,7 @@ public class TokenService : ServiceBasePg
                 }
             }
         }
-        
+
         ret.Add(newToken);
 
         return ret.ToArray();

@@ -25,5 +25,4 @@ public sealed class UserAdminController : ControllerBase
         _logger.LogInformation("user registered");
         return Ok();
     }
-    
 }

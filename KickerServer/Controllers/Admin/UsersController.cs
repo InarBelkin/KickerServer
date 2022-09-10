@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using BLL.Dtos.Auth;
+using BLL.Dtos.Messages;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -42,5 +43,11 @@ public class UsersController : ControllerBase
         var answer = await _authService.LoginByEmailRefresh(refreshDto);
 
         return Ok(answer);
+    }
+
+    [HttpPost("logout")]
+    public async Task<ActionResult<MessageBaseDto>> Logout(LogoutDto logoutDto)
+    {
+        return Ok(await _authService.Logout(logoutDto));
     }
 }

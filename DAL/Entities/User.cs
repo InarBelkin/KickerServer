@@ -1,4 +1,5 @@
 using DAL.Entities.Auth;
+using DAL.Entities.Battle;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Entities;
@@ -10,4 +11,7 @@ public class User : BaseEntity
     public StatsOneVsOne? StatsOneVsOne { get; set; }
     public StatsTwoVsTwo? StatsTwoVsTwo { get; set; }
     public List<AuthInfo> AuthInfos { get; set; } = new();
+
+    public List<Battle.Battle> Battles { get; set; } = new();
+    public List<UserBattle> UserBattles { get; set; } = new();
 }

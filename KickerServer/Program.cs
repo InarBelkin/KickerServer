@@ -1,3 +1,4 @@
+using BLL.Services.Hubs;
 using BLL.Util;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.BLLRegister(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSignalR();
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -26,10 +29,19 @@ app.UseHttpLogging();
 
 //app.UseHttpsRedirection();
 
+app.UseRouting();
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true)
+    .AllowCredentials());
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<InvitationHub>("/invitation");
+    endpoints.MapControllers();
+});
 
 app.Run();
